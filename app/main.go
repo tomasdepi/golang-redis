@@ -45,7 +45,7 @@ func processCommand(command []resp.Value, conn net.Conn) {
 		if !exist {
 			wr.WriteNull()
 		} else {
-			wr.WriteString(value)
+			wr.WriteString(value.(string))
 		}
 
 		conn.Write([]byte(buf.String()))
