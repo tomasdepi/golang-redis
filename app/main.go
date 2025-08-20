@@ -14,6 +14,8 @@ import (
 var _ = net.Listen
 var _ = os.Exit
 
+var inMemory = make(map[string]string)
+
 func processCommand(command []resp.Value, conn net.Conn) {
 
 	switch command[0].String() {
@@ -23,6 +25,30 @@ func processCommand(command []resp.Value, conn net.Conn) {
 		wr := resp.NewWriter(&buf)
 		wr.WriteString(command[1].String())
 		conn.Write([]byte(buf.String()))
+	case "SET":
+		key := command[1].String()
+		value := command[2].String()
+		inMemory[key] = value
+
+		var buf bytes.Buffer
+		wr := resp.NewWriter(&buf)
+		wr.WriteString("OK")
+		conn.Write([]byte(buf.String()))
+	case "GET":
+		key := command[1].String()
+		var buf bytes.Buffer
+		wr := resp.NewWriter(&buf)
+
+		value, exist := inMemory[key]
+
+		if !exist {
+			wr.WriteNull()
+		} else {
+			wr.WriteString(value)
+		}
+
+		conn.Write([]byte(buf.String()))
+
 	default:
 		fmt.Println("No conozco el comando")
 		conn.Write([]byte("+PONG\r\n"))
