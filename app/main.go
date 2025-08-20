@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"sync"
 
 	"github.com/tidwall/resp"
 )
@@ -14,7 +15,7 @@ import (
 var _ = net.Listen
 var _ = os.Exit
 
-var inMemory = make(map[string]string)
+var DB sync.Map
 
 func processCommand(command []resp.Value, conn net.Conn) {
 
@@ -28,7 +29,7 @@ func processCommand(command []resp.Value, conn net.Conn) {
 	case "SET":
 		key := command[1].String()
 		value := command[2].String()
-		inMemory[key] = value
+		DB.Store(key, value)
 
 		var buf bytes.Buffer
 		wr := resp.NewWriter(&buf)
@@ -39,7 +40,7 @@ func processCommand(command []resp.Value, conn net.Conn) {
 		var buf bytes.Buffer
 		wr := resp.NewWriter(&buf)
 
-		value, exist := inMemory[key]
+		value, exist := DB.Load(key)
 
 		if !exist {
 			wr.WriteNull()
