@@ -1,20 +1,40 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"net"
 	"os"
+
+	"github.com/tidwall/resp"
 )
 
 // Ensures gofmt doesn't remove the "net" and "os" imports in stage 1 (feel free to remove this!)
 var _ = net.Listen
 var _ = os.Exit
 
+func processCommand(command []resp.Value, conn net.Conn) {
+
+	switch command[0].String() {
+	case "ECHO":
+		//r := fmt.Sprintf("+%s\r\n", command[1].String())
+		var buf bytes.Buffer
+		wr := resp.NewWriter(&buf)
+		wr.WriteString(command[1].String())
+		conn.Write([]byte(buf.String()))
+	default:
+		fmt.Println("No conozco el comando")
+		conn.Write([]byte("+PONG\r\n"))
+
+	}
+}
+
 func handleNewClient(conn net.Conn) {
-	buffer := make([]byte, 1024)
 
 	for {
+		buffer := make([]byte, 1024)
+
 		_, err := conn.Read(buffer)
 
 		if err != nil {
@@ -22,7 +42,26 @@ func handleNewClient(conn net.Conn) {
 			return
 		}
 
-		conn.Write([]byte("+PONG\r\n"))
+		parser := resp.NewReader(bytes.NewBuffer(buffer))
+		command := []resp.Value{}
+
+		for {
+			v, _, err := parser.ReadValue()
+
+			if err != nil {
+				break
+			}
+
+			fmt.Printf("Read %s\n", v.Type())
+			if v.Type() == resp.Array {
+				for i, v := range v.Array() {
+					fmt.Printf("  #%d %s, value: '%s'\n", i, v.Type(), v)
+					command = append(command, v)
+				}
+			}
+		}
+
+		processCommand(command, conn)
 	}
 }
 
@@ -45,7 +84,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		defer conn.Close()
+		// defer conn.Close()
 
 		go handleNewClient(conn)
 	}
