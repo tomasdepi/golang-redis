@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"net"
+	"strings"
 	"time"
 
 	"github.com/codecrafters-io/redis-starter-go/app/db"
@@ -152,7 +153,7 @@ func parseSet(input []resp.Value) SetCommand {
 	}
 
 	if len(input) > 3 {
-		opValue := input[3].String()
+		opValue := strings.ToUpper(input[3].String())
 		if opValue == "PX" {
 			sc.px = int64(input[4].Integer())
 		}
