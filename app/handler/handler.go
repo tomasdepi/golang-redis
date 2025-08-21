@@ -10,45 +10,6 @@ import (
 	"github.com/tidwall/resp"
 )
 
-// var DB sync.Map
-
-// func processCommand(command []resp.Value, conn net.Conn) {
-
-// 	var buf bytes.Buffer
-// 	wr := resp.NewWriter(&buf)
-
-// 	switch command[0].String() {
-// 	case "ECHO":
-// 		wr.WriteString(command[1].String())
-// 	case "SET":
-// 		key := command[1].String()
-// 		value := command[2].String()
-
-// 		rv := RedisValue{
-// 			Val:  value,
-// 			Type: 1,
-// 		}
-
-// 		DB.Store(key, rv)
-
-// 		wr.WriteString("OK")
-// 	case "GET":
-// 		key := command[1].String()
-
-// 		if rv, exist := DB.Load(key); exist {
-// 			rv := rv.(RedisValue)
-// 			wr.WriteString(rv.Val.(string))
-// 		} else {
-// 			wr.WriteNull()
-// 		}
-
-// 	default:
-// 		wr.WriteError(fmt.Errorf("ERR unknown command '%s'", command[0].String()))
-// 	}
-
-// 	conn.Write([]byte(buf.String()))
-// }
-
 func HandleNewClient(conn net.Conn) {
 
 	for {

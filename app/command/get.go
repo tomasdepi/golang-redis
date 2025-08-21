@@ -8,6 +8,10 @@ import (
 	"github.com/tidwall/resp"
 )
 
+type GetCommand struct {
+	key string
+}
+
 func parseGet(input []resp.Value) GetCommand {
 	return GetCommand{
 		key: input[1].String(),

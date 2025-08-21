@@ -21,10 +21,6 @@ type CCommand struct {
 	msg string
 }
 
-type GetCommand struct {
-	key string
-}
-
 func (cc CCommand) Execute(conn net.Conn) {
 	var buf bytes.Buffer
 	wr := resp.NewWriter(&buf)
@@ -52,6 +48,8 @@ func ParseCommand(input []resp.Value) (RedisCommand, error) {
 		return parseCC(input), nil
 	case "PING":
 		return parsePing(input), nil
+	case "RPUSH":
+		return ParseRPush(input), nil
 	default:
 		return nil, fmt.Errorf("redis Command %s not supported", c)
 	}
