@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"net"
-	"strings"
-	"time"
 
 	"github.com/codecrafters-io/redis-starter-go/app/db"
 	"github.com/tidwall/resp"
@@ -20,10 +18,6 @@ type RedisCommand interface {
 }
 
 type CCommand struct {
-	msg string
-}
-
-type EchoCommand struct {
 	msg string
 }
 
@@ -49,66 +43,6 @@ func (cc CCommand) Execute(conn net.Conn) {
 	wr := resp.NewWriter(&buf)
 
 	wr.WriteString("PONG")
-	conn.Write([]byte(buf.String()))
-}
-
-func (ec EchoCommand) Execute(conn net.Conn) {
-	var buf bytes.Buffer
-	wr := resp.NewWriter(&buf)
-
-	wr.WriteString(ec.msg)
-	conn.Write([]byte(buf.String()))
-}
-
-func (sc SetCommand) Execute(conn net.Conn) {
-
-	rv := db.RedisValue{
-		Val:       sc.val,
-		Type:      1,
-		ExpiresAt: time.Now().UnixMilli() + sc.px,
-		Expires:   sc.px != 0,
-	}
-
-	DB.Store(sc.key, rv)
-
-	var buf bytes.Buffer
-	wr := resp.NewWriter(&buf)
-
-	wr.WriteString("OK")
-	conn.Write([]byte(buf.String()))
-}
-
-func (gc GetCommand) Execute(conn net.Conn) {
-
-	var buf bytes.Buffer
-	wr := resp.NewWriter(&buf)
-
-	rv, ok := DB.Load(gc.key)
-
-	if !ok {
-		wr.WriteNull()
-		conn.Write([]byte(buf.String()))
-		return
-	}
-
-	// check expiracy
-	if !rv.Expires {
-		wr.WriteString(rv.Val.(string))
-	} else {
-		if rv.ExpiresAt > time.Now().UnixMilli() {
-			wr.WriteString(rv.Val.(string))
-		} else {
-			wr.WriteNull()
-			DB.Delete(gc.key)
-		}
-	}
-
-	// rv.ExpiresAt > time.Now().UnixMilli() {
-	// 	wr.WriteNull()
-	// } else {
-	// 	wr.WriteString(rv.Val.(string))
-	// }
-
 	conn.Write([]byte(buf.String()))
 }
 
@@ -139,33 +73,5 @@ func ParseCommand(input []resp.Value) (RedisCommand, error) {
 func parseCC(input []resp.Value) CCommand {
 	return CCommand{
 		msg: input[1].String(),
-	}
-}
-
-func parseEcho(input []resp.Value) EchoCommand {
-	return EchoCommand{
-		msg: input[1].String(),
-	}
-}
-
-func parseSet(input []resp.Value) SetCommand {
-	sc := SetCommand{
-		key: input[1].String(),
-		val: input[2].String(),
-	}
-
-	if len(input) > 3 {
-		opValue := strings.ToUpper(input[3].String())
-		if opValue == "PX" {
-			sc.px = int64(input[4].Integer())
-		}
-	}
-
-	return sc
-}
-
-func parseGet(input []resp.Value) GetCommand {
-	return GetCommand{
-		key: input[1].String(),
 	}
 }
