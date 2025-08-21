@@ -129,6 +129,8 @@ func ParseCommand(input []resp.Value) (RedisCommand, error) {
 		return parseGet(input), nil
 	case "COMMAND":
 		return parseCC(input), nil
+	case "PING":
+		return parsePing(input), nil
 	default:
 		return nil, fmt.Errorf("redis Command %s not supported", c)
 	}
