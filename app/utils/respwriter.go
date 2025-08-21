@@ -31,6 +31,14 @@ func WriteString(conn net.Conn, s string) {
 	conn.Write([]byte(buf.String()))
 }
 
+func WriteSimpleString(conn net.Conn, s string) {
+	var buf bytes.Buffer
+	wr := resp.NewWriter(&buf)
+
+	wr.WriteSimpleString(s)
+	conn.Write([]byte(buf.String()))
+}
+
 func WriteNull(conn net.Conn) {
 	var buf bytes.Buffer
 	wr := resp.NewWriter(&buf)

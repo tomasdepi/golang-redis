@@ -31,5 +31,5 @@ func (pc PingCommand) Execute(conn net.Conn) {
 		msg = "PONG"
 	}
 
-	utils.WriteString(conn, msg)
+	utils.WriteSimpleString(conn, msg)
 }
