@@ -27,9 +27,9 @@ func (pc PingCommand) Execute(conn net.Conn) {
 	wr := resp.NewWriter(&buf)
 
 	if pc.msg != "" {
-		wr.WriteString(pc.msg)
+		wr.WriteSimpleString(pc.msg)
 	} else {
-		wr.WriteString("PONG")
+		wr.WriteSimpleString("PONG")
 	}
 
 	conn.Write([]byte(buf.String()))
