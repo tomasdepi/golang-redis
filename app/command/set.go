@@ -10,6 +10,19 @@ import (
 	"github.com/tidwall/resp"
 )
 
+type SetCommand struct {
+	key string
+	val string
+
+	// ex int
+	px int64
+
+	// nx bool
+	// xx bool
+
+	// get bool
+}
+
 func parseSet(input []resp.Value) SetCommand {
 	sc := SetCommand{
 		key: input[1].String(),

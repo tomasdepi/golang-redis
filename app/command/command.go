@@ -21,19 +21,6 @@ type CCommand struct {
 	msg string
 }
 
-type SetCommand struct {
-	key string
-	val string
-
-	// ex int
-	px int64
-
-	// nx bool
-	// xx bool
-
-	// get bool
-}
-
 type GetCommand struct {
 	key string
 }
