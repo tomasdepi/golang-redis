@@ -1,12 +1,12 @@
 package command
 
 import (
-	"bytes"
 	"net"
 	"strings"
 	"time"
 
 	"github.com/codecrafters-io/redis-starter-go/app/db"
+	"github.com/codecrafters-io/redis-starter-go/app/utils"
 	"github.com/tidwall/resp"
 )
 
@@ -50,9 +50,5 @@ func (sc SetCommand) Execute(conn net.Conn) {
 
 	DB.Store(sc.key, rv)
 
-	var buf bytes.Buffer
-	wr := resp.NewWriter(&buf)
-
-	wr.WriteString("OK")
-	conn.Write([]byte(buf.String()))
+	utils.WriteString(conn, "OK")
 }

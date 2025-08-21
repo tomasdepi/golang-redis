@@ -1,10 +1,10 @@
 package command
 
 import (
-	"bytes"
 	"net"
 
 	"github.com/codecrafters-io/redis-starter-go/app/db"
+	"github.com/codecrafters-io/redis-starter-go/app/utils"
 	"github.com/tidwall/resp"
 )
 
@@ -43,9 +43,5 @@ func (rpc RPushCommand) Execute(conn net.Conn) {
 		listLen = len(newSlice)
 	}
 
-	var buf bytes.Buffer
-	wr := resp.NewWriter(&buf)
-
-	wr.WriteInteger(listLen)
-	conn.Write([]byte(buf.String()))
+	utils.WriteInteger(conn, listLen)
 }

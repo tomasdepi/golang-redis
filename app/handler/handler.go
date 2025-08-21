@@ -7,6 +7,7 @@ import (
 	"net"
 
 	"github.com/codecrafters-io/redis-starter-go/app/command"
+	"github.com/codecrafters-io/redis-starter-go/app/utils"
 	"github.com/tidwall/resp"
 )
 
@@ -43,16 +44,16 @@ func HandleNewClient(conn net.Conn) {
 		rc, err := command.ParseCommand(respValues)
 
 		if err != nil {
+			utils.WriteError(conn, err)
 			log.Println(err)
+			continue
 		}
 
 		rc.Execute(conn)
-		//processCommand(respValues, conn)
 		//buffer = buffer[:0] // resets buffer
 	}
 }
 
 // TODO
 // 1. better buffer handling
-// 2. non case sensitive commands
-// 3. check command parse errors
+// 2. check command parse errors

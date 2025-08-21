@@ -1,9 +1,9 @@
 package command
 
 import (
-	"bytes"
 	"net"
 
+	"github.com/codecrafters-io/redis-starter-go/app/utils"
 	"github.com/tidwall/resp"
 )
 
@@ -23,14 +23,13 @@ func parsePing(input []resp.Value) PingCommand {
 }
 
 func (pc PingCommand) Execute(conn net.Conn) {
-	var buf bytes.Buffer
-	wr := resp.NewWriter(&buf)
+	var msg string
 
 	if pc.msg != "" {
-		wr.WriteSimpleString(pc.msg)
+		msg = pc.msg
 	} else {
-		wr.WriteSimpleString("PONG")
+		msg = "PONG"
 	}
 
-	conn.Write([]byte(buf.String()))
+	utils.WriteString(conn, msg)
 }

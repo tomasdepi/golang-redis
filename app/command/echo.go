@@ -1,9 +1,10 @@
 package command
 
 import (
-	"bytes"
+	"fmt"
 	"net"
 
+	"github.com/codecrafters-io/redis-starter-go/app/utils"
 	"github.com/tidwall/resp"
 )
 
@@ -11,16 +12,17 @@ type EchoCommand struct {
 	msg string
 }
 
-func parseEcho(input []resp.Value) EchoCommand {
+func parseEcho(input []resp.Value) (EchoCommand, error) {
+
+	if len(input) != 2 {
+		return EchoCommand{}, fmt.Errorf("(error) ERR wrong number of arguments for 'echo' command")
+	}
+
 	return EchoCommand{
 		msg: input[1].String(),
-	}
+	}, nil
 }
 
 func (ec EchoCommand) Execute(conn net.Conn) {
-	var buf bytes.Buffer
-	wr := resp.NewWriter(&buf)
-
-	wr.WriteString(ec.msg)
-	conn.Write([]byte(buf.String()))
+	utils.WriteString(conn, ec.msg)
 }
