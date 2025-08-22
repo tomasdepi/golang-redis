@@ -54,7 +54,7 @@ func (lrc LRangeCommand) Execute(conn net.Conn) {
 
 		stop := min(lrc.stop, len(slice))
 
-		utils.WriteArray(conn, rv.Val.([]string)[lrc.start:stop])
+		utils.WriteArray(conn, rv.Val.([]string)[lrc.start:stop+1])
 	}
 
 }
