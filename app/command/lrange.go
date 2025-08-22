@@ -57,7 +57,7 @@ func (lrc LRangeCommand) Execute(conn net.Conn) {
 		var stop int
 
 		if lrc.start < 0 {
-			start = max(0, len(slice)+start)
+			start = max(0, len(slice)+lrc.start)
 		} else {
 			start = lrc.start
 		}
