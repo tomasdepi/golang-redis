@@ -64,6 +64,9 @@ func (lrc LRangeCommand) Execute(conn net.Conn) {
 			stop = max(0, len(slice)+stop)
 		}
 
+		fmt.Println(start)
+		fmt.Println(stop)
+
 		stop = min(stop+1, len(slice)) // because LRANGE includes stop_index but golang does not
 
 		partialSlice := slice[start:stop]
