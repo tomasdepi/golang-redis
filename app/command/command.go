@@ -18,6 +18,7 @@ const (
 	PING    = "PING"
 	RPUSH   = "RPUSH"
 	LRANGE  = "LRANGE"
+	LPUSH   = "LPUSH"
 )
 
 var DB = db.RedisDB{}
@@ -57,6 +58,8 @@ func ParseCommand(input []resp.Value) (RedisCommand, error) {
 		return ParseRPush(input)
 	case LRANGE:
 		return parseLRange(input)
+	case LPUSH:
+		return ParseLPush(input)
 	default:
 		return nil, fmt.Errorf("redis Command %s not supported", c)
 	}
