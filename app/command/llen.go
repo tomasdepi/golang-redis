@@ -29,7 +29,7 @@ func (gc LlenCommand) Execute(conn net.Conn) {
 	rv, ok := DB.Load(gc.key)
 
 	if !ok {
-		utils.WriteNull(conn)
+		utils.WriteInteger(conn, 0)
 		return
 	}
 
