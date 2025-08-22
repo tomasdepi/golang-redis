@@ -1,6 +1,7 @@
 package command
 
 import (
+	"fmt"
 	"net"
 	"strings"
 	"time"
@@ -23,7 +24,12 @@ type SetCommand struct {
 	// get bool
 }
 
-func parseSet(input []resp.Value) SetCommand {
+func parseSet(input []resp.Value) (SetCommand, error) {
+
+	if len(input) < 3 {
+		return SetCommand{}, fmt.Errorf("(error) ERR wrong number of arguments for 'set' command")
+	}
+
 	sc := SetCommand{
 		key: input[1].String(),
 		val: input[2].String(),
@@ -36,7 +42,7 @@ func parseSet(input []resp.Value) SetCommand {
 		}
 	}
 
-	return sc
+	return sc, nil
 }
 
 func (sc SetCommand) Execute(conn net.Conn) {

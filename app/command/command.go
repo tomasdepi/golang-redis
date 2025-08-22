@@ -10,8 +10,6 @@ import (
 	"github.com/tidwall/resp"
 )
 
-// const AVAILABLE_COMMANDS = []string{"ECHO", "SET", "GET"}
-
 const (
 	GET     = "GET"
 	ECHO    = "ECHO"
@@ -47,22 +45,22 @@ func ParseCommand(input []resp.Value) (RedisCommand, error) {
 	case ECHO:
 		return parseEcho(input)
 	case SET:
-		return parseSet(input), nil
+		return parseSet(input)
 	case GET:
-		return parseGet(input), nil
+		return parseGet(input)
 	case COMMAND:
-		return parseCC(input), nil
+		return parseCC(input)
 	case PING:
-		return parsePing(input), nil
+		return parsePing(input)
 	case RPUSH:
-		return ParseRPush(input), nil
+		return ParseRPush(input)
 	default:
 		return nil, fmt.Errorf("redis Command %s not supported", c)
 	}
 }
 
-func parseCC(input []resp.Value) CCommand {
+func parseCC(input []resp.Value) (CCommand, error) {
 	return CCommand{
 		msg: input[1].String(),
-	}
+	}, nil
 }

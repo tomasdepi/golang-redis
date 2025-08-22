@@ -1,6 +1,7 @@
 package command
 
 import (
+	"fmt"
 	"net"
 
 	"github.com/codecrafters-io/redis-starter-go/app/db"
@@ -13,11 +14,16 @@ type RPushCommand struct {
 	element string
 }
 
-func ParseRPush(input []resp.Value) RPushCommand {
+func ParseRPush(input []resp.Value) (RPushCommand, error) {
+
+	if len(input) < 3 {
+		return RPushCommand{}, fmt.Errorf("(error) ERR wrong number of arguments for 'rpush' command")
+	}
+
 	return RPushCommand{
 		key:     input[1].String(),
 		element: input[2].String(),
-	}
+	}, nil
 }
 
 func (rpc RPushCommand) Execute(conn net.Conn) {

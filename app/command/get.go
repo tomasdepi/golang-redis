@@ -1,6 +1,7 @@
 package command
 
 import (
+	"fmt"
 	"net"
 	"time"
 
@@ -12,10 +13,15 @@ type GetCommand struct {
 	key string
 }
 
-func parseGet(input []resp.Value) GetCommand {
+func parseGet(input []resp.Value) (GetCommand, error) {
+
+	if len(input) != 2 {
+		return GetCommand{}, fmt.Errorf("(error) ERR wrong number of arguments for 'get' command")
+	}
+
 	return GetCommand{
 		key: input[1].String(),
-	}
+	}, nil
 }
 
 func (gc GetCommand) Execute(conn net.Conn) {
