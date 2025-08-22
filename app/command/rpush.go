@@ -34,26 +34,22 @@ func ParseRPush(input []resp.Value) (RPushCommand, error) {
 
 func (rpc RPushCommand) Execute(conn net.Conn) {
 
-	var listLen int
+	var newSlice []string
 
 	if rv, ok := DB.Load(rpc.key); !ok {
-		newRedisValue := db.RedisValue{
-			Val:  rpc.elements,
-			Type: 2,
-		}
-
-		DB.Store(rpc.key, newRedisValue)
-		listLen = len(rpc.elements)
+		// key does not exist
+		newSlice = rpc.elements
 	} else {
-		newSlice := append(rv.Val.([]string), rpc.elements...)
-		newRedisValue := db.RedisValue{
-			Val:  newSlice,
-			Type: 2,
-		}
-
-		DB.Store(rpc.key, newRedisValue)
-		listLen = len(newSlice)
+		// key already exists
+		newSlice = append(rv.Val.([]string), rpc.elements...)
 	}
 
-	utils.WriteInteger(conn, listLen)
+	newRedisValue := db.RedisValue{
+		Val:  newSlice,
+		Type: 2,
+	}
+
+	DB.Store(rpc.key, newRedisValue)
+
+	utils.WriteInteger(conn, len(newSlice))
 }
