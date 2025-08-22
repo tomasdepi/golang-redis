@@ -52,9 +52,10 @@ func (lrc LRangeCommand) Execute(conn net.Conn) {
 			return
 		}
 
-		stop := min(lrc.stop, len(slice)+1)
+		stop := min(lrc.stop+1, len(slice)+1) // because LRANGE includes stop_index but golang does not
+		partialSlice := rv.Val.([]string)[lrc.start:stop]
 
-		utils.WriteArray(conn, rv.Val.([]string)[lrc.start:stop])
+		utils.WriteArray(conn, partialSlice)
 	}
 
 }
