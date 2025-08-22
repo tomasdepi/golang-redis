@@ -47,7 +47,7 @@ func (lrc LRangeCommand) Execute(conn net.Conn) {
 
 		slice := rv.Val.([]string)
 
-		if lrc.start >= len(slice) || lrc.start > lrc.stop {
+		if lrc.start >= len(slice) {
 			utils.WriteArray(conn, []string{})
 			return
 		}
@@ -58,16 +58,19 @@ func (lrc LRangeCommand) Execute(conn net.Conn) {
 
 		if lrc.start < 0 {
 			start = min(0, len(slice)+start)
+		} else {
+			start = lrc.start
 		}
 
 		if lrc.stop < 0 {
-			stop = max(0, len(slice)+stop)
+			stop = max(0, len(slice)+lrc.stop)
+			stop = min(stop+1, len(slice)) // because LRANGE includes stop_index but golang does not
+		} else {
+			stop = min(lrc.stop+1, len(slice)) // because LRANGE includes stop_index but golang does not
 		}
 
 		fmt.Println(start)
 		fmt.Println(stop)
-
-		stop = min(stop+1, len(slice)) // because LRANGE includes stop_index but golang does not
 
 		partialSlice := slice[start:stop]
 
