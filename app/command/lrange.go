@@ -52,8 +52,20 @@ func (lrc LRangeCommand) Execute(conn net.Conn) {
 			return
 		}
 
-		stop := min(lrc.stop+1, len(slice)) // because LRANGE includes stop_index but golang does not
-		partialSlice := rv.Val.([]string)[lrc.start:stop]
+		// An index of -1 refers to the last element, -2 to the second last, and so on. If a negative index is out of range (i.e. >= the length of the list), it is treated as 0 (start of the list)
+		var start int
+		var stop int
+
+		if start < 0 {
+			start = min(0, len(slice)+start)
+		}
+
+		if stop < 0 {
+			stop = min(lrc.stop+1, len(slice)+stop)
+		}
+
+		//stop = min(lrc.stop+1, len(slice)) // because LRANGE includes stop_index but golang does not
+		partialSlice := slice[start:stop]
 
 		utils.WriteArray(conn, partialSlice)
 	}
