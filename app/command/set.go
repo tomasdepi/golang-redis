@@ -49,7 +49,7 @@ func (sc SetCommand) Execute(conn net.Conn) {
 
 	rv := db.RedisValue{
 		Val:       sc.val,
-		Type:      1,
+		Type:      db.SINGLE_VALUE,
 		ExpiresAt: time.Now().UnixMilli() + sc.px,
 		Expires:   sc.px != 0,
 	}

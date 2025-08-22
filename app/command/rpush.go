@@ -46,7 +46,7 @@ func (rpc RPushCommand) Execute(conn net.Conn) {
 
 	newRedisValue := db.RedisValue{
 		Val:  newSlice,
-		Type: 2,
+		Type: db.ARRAY_VALUE,
 	}
 
 	DB.Store(rpc.key, newRedisValue)

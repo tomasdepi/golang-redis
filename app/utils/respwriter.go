@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bytes"
+	"fmt"
 	"net"
 
 	"github.com/tidwall/resp"
@@ -45,4 +46,26 @@ func WriteNull(conn net.Conn) {
 
 	wr.WriteNull()
 	conn.Write([]byte(buf.String()))
+}
+
+func WriteTypeOperationError(conn net.Conn) {
+	WriteError(conn, fmt.Errorf("WRONGTYPE Operation against a key holding the wrong kind of value"))
+}
+
+func WriteArray(conn net.Conn, values []string) {
+	var buf bytes.Buffer
+	wr := resp.NewWriter(&buf)
+
+	respValues := make([]resp.Value, len(values))
+
+	for i, v := range values {
+		respValues[i] = resp.StringValue(v)
+	}
+
+	wr.WriteArray(respValues)
+	conn.Write([]byte(buf.String()))
+}
+
+func WriteEmptyArray(conn net.Conn) {
+	WriteArray(conn, []string{})
 }

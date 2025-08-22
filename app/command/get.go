@@ -5,6 +5,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/codecrafters-io/redis-starter-go/app/db"
 	"github.com/codecrafters-io/redis-starter-go/app/utils"
 	"github.com/tidwall/resp"
 )
@@ -30,6 +31,11 @@ func (gc GetCommand) Execute(conn net.Conn) {
 
 	if !ok {
 		utils.WriteNull(conn)
+		return
+	}
+
+	if rv.Type != db.SINGLE_VALUE {
+		utils.WriteTypeOperationError(conn)
 		return
 	}
 

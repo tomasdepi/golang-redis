@@ -4,6 +4,11 @@ import (
 	"sync"
 )
 
+const (
+	SINGLE_VALUE = 1
+	ARRAY_VALUE  = 2
+)
+
 type RedisValue struct {
 	Val       any
 	ExpiresAt int64
