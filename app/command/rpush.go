@@ -10,8 +10,8 @@ import (
 )
 
 type RPushCommand struct {
-	key     string
-	element string
+	key      string
+	elements []string
 }
 
 func ParseRPush(input []resp.Value) (RPushCommand, error) {
@@ -20,9 +20,15 @@ func ParseRPush(input []resp.Value) (RPushCommand, error) {
 		return RPushCommand{}, fmt.Errorf("(error) ERR wrong number of arguments for 'rpush' command")
 	}
 
+	var parsedElements []string
+
+	for _, e := range input[2:] {
+		parsedElements = append(parsedElements, e.String())
+	}
+
 	return RPushCommand{
-		key:     input[1].String(),
-		element: input[2].String(),
+		key:      input[1].String(),
+		elements: parsedElements,
 	}, nil
 }
 
@@ -32,14 +38,14 @@ func (rpc RPushCommand) Execute(conn net.Conn) {
 
 	if rv, ok := DB.Load(rpc.key); !ok {
 		newRedisValue := db.RedisValue{
-			Val:  []string{rpc.element},
+			Val:  rpc.elements,
 			Type: 2,
 		}
 
 		DB.Store(rpc.key, newRedisValue)
-		listLen = 1
+		listLen = len(rpc.elements)
 	} else {
-		newSlice := append(rv.Val.([]string), rpc.element)
+		newSlice := append(rv.Val.([]string), rpc.elements...)
 		newRedisValue := db.RedisValue{
 			Val:  newSlice,
 			Type: 2,
