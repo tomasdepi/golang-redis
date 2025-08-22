@@ -52,9 +52,9 @@ func (lrc LRangeCommand) Execute(conn net.Conn) {
 			return
 		}
 
-		stop := min(lrc.stop, len(slice))
+		stop := min(lrc.stop, len(slice)+1)
 
-		utils.WriteArray(conn, rv.Val.([]string)[lrc.start:stop+1])
+		utils.WriteArray(conn, rv.Val.([]string)[lrc.start:stop])
 	}
 
 }
