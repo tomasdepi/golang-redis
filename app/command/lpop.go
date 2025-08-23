@@ -53,10 +53,10 @@ func (lpop LpopCommand) Execute(conn net.Conn) {
 
 	DB.Store(lpop.key, newRedisValue)
 
-	itemsRemoved := rv.Val.([]string)[:lpop.count+1]
+	itemsRemoved := rv.Val.([]string)[:lpop.count]
 
 	if lpop.count == 1 {
-		utils.WriteString(conn, itemsRemoved[1])
+		utils.WriteString(conn, itemsRemoved[0])
 	} else {
 		utils.WriteArray(conn, itemsRemoved)
 	}
