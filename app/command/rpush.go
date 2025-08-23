@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/codecrafters-io/redis-starter-go/app/db"
-	"github.com/codecrafters-io/redis-starter-go/app/utils"
 	"github.com/tidwall/resp"
+	"github.com/tomasdepi/golang-redis/app/db"
+	"github.com/tomasdepi/golang-redis/app/utils"
 )
 
 type RPushCommand struct {

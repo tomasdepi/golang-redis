@@ -6,9 +6,9 @@ import (
 	"log"
 	"net"
 
-	"github.com/codecrafters-io/redis-starter-go/app/command"
-	"github.com/codecrafters-io/redis-starter-go/app/utils"
 	"github.com/tidwall/resp"
+	"github.com/tomasdepi/golang-redis/app/command"
+	"github.com/tomasdepi/golang-redis/app/utils"
 )
 
 func HandleNewClient(conn net.Conn) {

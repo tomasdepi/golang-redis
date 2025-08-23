@@ -1,4 +1,4 @@
-module github.com/codecrafters-io/redis-starter-go
+module github.com/tomasdepi/golang-redis
 
 go 1.24.0
 
