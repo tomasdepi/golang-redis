@@ -2,7 +2,6 @@ package db
 
 import (
 	"fmt"
-	"log"
 	"sync"
 )
 
@@ -42,7 +41,6 @@ func (db *RedisDB) Delete(key string) {
 func (db *RedisDB) AddWaiter(key string, ch chan string) {
 	if channels, ok := db.waiters.Load(key); ok {
 		new := append(channels.([]chan string), ch)
-		log.Printf("I have %s waiter now \n", string(len(new)))
 		db.waiters.Store(key, new)
 	} else {
 		db.waiters.Store(key, []chan string{ch})
@@ -54,9 +52,9 @@ func (db *RedisDB) PopWaiter(key string) (chan string, error) {
 		popedCh := channels.([]chan string)[0]
 		db.waiters.Store(key, channels.([]chan string)[1:])
 
-		// if len(channels.([]chan string)[1:]) == 0 {
-		// 	db.DeleteWaiterEntry(key)
-		// }
+		if len(channels.([]chan string)[1:]) == 0 {
+			db.DeleteWaiterEntry(key)
+		}
 
 		return popedCh, nil
 	}
