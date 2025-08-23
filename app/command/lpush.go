@@ -56,4 +56,14 @@ func (lpc LPushCommand) Execute(conn net.Conn) {
 	DB.Store(lpc.key, newRedisValue)
 
 	utils.WriteInteger(conn, len(newSlice))
+
+	DB.Store(lpc.key, newRedisValue)
+	utils.WriteInteger(conn, len(newSlice))
+
+	// check if key has waiter
+	ch, err := DB.PopWaiter(lpc.key)
+
+	if err == nil {
+		ch <- newSlice[0]
+	}
 }
