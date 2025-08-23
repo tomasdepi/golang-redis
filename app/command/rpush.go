@@ -2,6 +2,7 @@ package command
 
 import (
 	"fmt"
+	"log"
 	"net"
 
 	"github.com/codecrafters-io/redis-starter-go/app/db"
@@ -50,6 +51,14 @@ func (rpc RPushCommand) Execute(conn net.Conn) {
 	}
 
 	DB.Store(rpc.key, newRedisValue)
+
+	ch, err := DB.PopWaiter(rpc.key)
+
+	if err != nil {
+		log.Printf("No waiter found for key %s\n", rpc.key)
+	}
+
+	ch <- newSlice[0]
 
 	utils.WriteInteger(conn, len(newSlice))
 }

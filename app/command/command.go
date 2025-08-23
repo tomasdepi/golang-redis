@@ -21,6 +21,7 @@ const (
 	LPUSH   = "LPUSH"
 	LLEN    = "LLEN"
 	LPOP    = "LPOP"
+	BLPOP   = "BLPOP"
 )
 
 var DB = db.RedisDB{}
@@ -66,6 +67,8 @@ func ParseCommand(input []resp.Value) (RedisCommand, error) {
 		return parseLlen(input)
 	case LPOP:
 		return parseLpop(input)
+	case BLPOP:
+		return parseBLpop(input)
 	default:
 		return nil, fmt.Errorf("redis Command %s not supported", c)
 	}

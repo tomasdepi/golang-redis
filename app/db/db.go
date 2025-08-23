@@ -1,6 +1,7 @@
 package db
 
 import (
+	"fmt"
 	"sync"
 )
 
@@ -17,7 +18,8 @@ type RedisValue struct {
 }
 
 type RedisDB struct {
-	data sync.Map
+	data    sync.Map
+	waiters sync.Map
 }
 
 func (db *RedisDB) Store(key string, val RedisValue) {
@@ -34,4 +36,31 @@ func (db *RedisDB) Load(key string) (RedisValue, bool) {
 
 func (db *RedisDB) Delete(key string) {
 	db.data.Delete(key)
+}
+
+func (db *RedisDB) AddWaiter(key string, ch chan string) {
+	if channels, ok := db.waiters.Load(key); ok {
+		db.waiters.Store(key, append(channels.([]chan string), ch))
+	} else {
+		db.waiters.Store(key, []chan string{ch})
+	}
+}
+
+func (db *RedisDB) PopWaiter(key string) (chan string, error) {
+	if channels, ok := db.waiters.Load(key); ok {
+		popedCh := channels.([]chan string)[0]
+		db.waiters.Store(key, channels.([]chan string)[1:])
+
+		if len(channels.([]chan string)[1:]) == 0 {
+			db.DeleteWaiterEntry(key)
+		}
+
+		return popedCh, nil
+	}
+
+	return nil, fmt.Errorf("waiter not found")
+}
+
+func (db *RedisDB) DeleteWaiterEntry(key string) {
+	db.waiters.Delete(key)
 }
