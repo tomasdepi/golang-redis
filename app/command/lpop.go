@@ -58,7 +58,7 @@ func (lpop LpopCommand) Execute(conn net.Conn) {
 
 type BLpopCommand struct {
 	key     string
-	timeout int
+	timeout float64
 }
 
 func parseBLpop(input []resp.Value) (BLpopCommand, error) {
@@ -69,7 +69,7 @@ func parseBLpop(input []resp.Value) (BLpopCommand, error) {
 
 	return BLpopCommand{
 		key:     input[1].String(),
-		timeout: input[2].Integer(),
+		timeout: input[2].Float(),
 	}, nil
 }
 
@@ -83,7 +83,7 @@ func (blpop BLpopCommand) Execute(conn net.Conn) {
 		var maxDuration time.Duration = 1<<63 - 1
 
 		if blpop.timeout != 0 {
-			maxDuration = time.Duration(blpop.timeout * int(time.Second))
+			maxDuration = time.Duration(blpop.timeout * float64(time.Second))
 		}
 
 		ch := make(chan string, 1)
