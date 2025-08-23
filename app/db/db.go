@@ -51,9 +51,9 @@ func (db *RedisDB) PopWaiter(key string) (chan string, error) {
 		popedCh := channels.([]chan string)[0]
 		db.waiters.Store(key, channels.([]chan string)[1:])
 
-		if len(channels.([]chan string)[1:]) == 0 {
-			db.DeleteWaiterEntry(key)
-		}
+		// if len(channels.([]chan string)[1:]) == 0 {
+		// 	db.DeleteWaiterEntry(key)
+		// }
 
 		return popedCh, nil
 	}
