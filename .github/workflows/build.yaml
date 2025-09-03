@@ -1,0 +1,44 @@
+name: "Build Docker Image and Deploy to DockerHub Registry"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'master'
+  
+env:
+  IMAGE_NAME: "tomasdepi94/redis"
+
+jobs:
+  build-docker:
+    runs-on: ubuntu-latest
+    name: Build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - uses: docker/build-push-action@v5
+        id: docker-build
+        with:
+          context: .
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+
+      - name: Output build data
+        run: |
+          echo "::notice:: Image: ${{ steps.docker-build.outputs.imageid }}"
+          echo "::notice:: Digest: ${{ steps.docker-build.outputs.digest }}"
