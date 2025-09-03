@@ -1,0 +1,33 @@
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test binaries
+*_test
+
+# Output of 'go build'
+*.out
+
+# Dependency caches
+# Go module cache (if not using vendoring)
+.go/
+# Vendor directory (if using vendoring)
+vendor/
+
+# IDE and Editor files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Temporary files
+*~
+#*#
+.#*
