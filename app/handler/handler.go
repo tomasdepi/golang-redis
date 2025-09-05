@@ -1,8 +1,9 @@
 package handler
 
 import (
-	"bytes"
-	"fmt"
+	"bufio"
+	"errors"
+	"io"
 	"log"
 	"net"
 
@@ -12,33 +13,27 @@ import (
 )
 
 func HandleNewClient(conn net.Conn) {
+	defer conn.Close()
+
+	reader := resp.NewReader(bufio.NewReader(conn))
 
 	for {
-		buffer := make([]byte, 1024)
-		_, err := conn.Read(buffer)
-
+		v, _, err := reader.ReadValue()
 		if err != nil {
-			log.Println("Error reading:", err)
-			return
+			if errors.Is(err, io.EOF) {
+				log.Println("Client disconnected")
+				return
+			}
+			log.Println("Error reading value:", err)
+			utils.WriteError(conn, err)
+			continue
 		}
 
-		parser := resp.NewReader(bytes.NewBuffer(buffer))
-		respValues := []resp.Value{}
-
-		for {
-			v, _, err := parser.ReadValue()
-
-			if err != nil {
-				break
-			}
-
-			fmt.Printf("Read %s\n", v.Type())
-			if v.Type() == resp.Array {
-				for i, v := range v.Array() {
-					fmt.Printf("  #%d %s, value: '%s'\n", i, v.Type(), v)
-					respValues = append(respValues, v)
-				}
-			}
+		var respValues []resp.Value
+		if v.Type() == resp.Array {
+			respValues = append(respValues, v.Array()...)
+		} else {
+			respValues = append(respValues, v)
 		}
 
 		rc, err := command.ParseCommand(respValues)
@@ -50,10 +45,5 @@ func HandleNewClient(conn net.Conn) {
 		}
 
 		rc.Execute(conn)
-		//buffer = buffer[:0] // resets buffer
 	}
 }
-
-// TODO
-// 1. better buffer handling
-// 2. check command parse errors
